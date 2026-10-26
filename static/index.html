@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JanSeva AI - Citizen Services Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Noto Sans Devanagari"', 'sans-serif'],
+          },
+          colors: {
+            gov: {
+              saffron: '#FF671F',
+              white: '#FFFFFF',
+              green: '#046A38',
+              navy: '#06038D',
+              blue: '#0B2545',
+              softblue: '#EEF4F8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .pulse-ring {
+      box-shadow: 0 0 0 0 rgba(255, 103, 31, 0.7);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 103, 31, 0.7); }
+      70% { box-shadow: 0 0 0 12px rgba(255, 103, 31, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 103, 31, 0); }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- Top Tricolor Accent Line -->
+  <div class="h-1.5 w-full bg-gradient-to-r from-[#FF671F] via-white to-[#046A38]"></div>
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3.5">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-gov-navy to-blue-900 flex items-center justify-center text-white shadow-md font-bold text-xl tracking-wider">
+          🇮🇳
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-xl font-bold text-slate-900 leading-tight">JanSeva AI</h1>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-orange-100 text-gov-saffron border border-orange-200">जनसेवा</span>
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">Sarvam AI Powered</span>
+          </div>
+          <p class="text-xs text-slate-500 font-medium">Citizen Services Assistant • Schemes • Verification • Voice Updates</p>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex items-center space-x-3">
+        <!-- Language Selector -->
+        <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
+          <svg class="w-4 h-4 text-slate-500 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+          <select id="langSelect" onchange="changeLanguage()" class="bg-transparent text-xs font-semibold text-slate-700 py-1 px-2 focus:outline-none cursor-pointer">
+            <option value="hi-IN" selected>हिन्दी (Hindi)</option>
+            <option value="en-IN">English</option>
+            <option value="ta-IN">தமிழ் (Tamil)</option>
+            <option value="te-IN">తెలుగు (Telugu)</option>
+            <option value="kn-IN">ಕನ್ನಡ (Kannada)</option>
+            <option value="bn-IN">বাংলা (Bengali)</option>
+            <option value="mr-IN">मराठी (Marathi)</option>
+            <option value="gu-IN">ગુજરાતી (Gujarati)</option>
+          </select>
+        </div>
+
+        <!-- API status badge -->
+        <div class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Sarvam Ready</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-100 flex space-x-8">
+      <button onclick="switchTab('chat')" id="tab-btn-chat" class="tab-btn py-3 border-b-2 border-gov-saffron text-gov-saffron font-semibold text-sm flex items-center space-x-2 transition">
+        <span>💬</span>
+        <span>Scheme & Tax Advisor</span>
+      </button>
+      <button onclick="switchTab('verify')" id="tab-btn-verify" class="tab-btn py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-900 font-semibold text-sm flex items-center space-x-2 transition">
+        <span>📑</span>
+        <span>Document Verification & Application</span>
+      </button>
+      <button onclick="switchTab('tracker')" id="tab-btn-tracker" class="tab-btn py-3 border-b-2 border-transparent text-slate-600 hover:text-slate-900 font-semibold text-sm flex items-center space-x-2 transition">
+        <span>🔔</span>
+        <span>Application Tracker & Proactive Alerts</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+    <!-- ==================== TAB 1: SCHEME & TAX CHAT ==================== -->
+    <div id="tab-chat" class="tab-pane flex flex-col h-[calc(100vh-210px)] bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+      <!-- Quick Prompts Bar -->
+      <div class="p-3 bg-slate-50 border-b border-slate-200 flex items-center gap-2 overflow-x-auto text-xs whitespace-nowrap">
+        <span class="font-bold text-slate-400 uppercase tracking-wider pl-1">Quick Schemes:</span>
+        <button onclick="askPrompt('पीएम किसान सम्मान निधि 17वीं किस्त की पात्रता और ई-केवाईसी कैसे करें?')" class="px-3 py-1.5 bg-white hover:bg-orange-50 hover:border-orange-300 border border-slate-200 rounded-full font-medium text-slate-700 transition">
+          🌾 PM-Kisan Samman Nidhi
+        </button>
+        <button onclick="askPrompt('आयुष्मान भारत 5 लाख का स्वास्थ्य कार्ड बनवाने के नियम और दस्तावेज़?')" class="px-3 py-1.5 bg-white hover:bg-orange-50 hover:border-orange-300 border border-slate-200 rounded-full font-medium text-slate-700 transition">
+          🛡️ Ayushman Golden Card
+        </button>
+        <button onclick="askPrompt('अटल पेंशन योजना में 60 वर्ष बाद ₹5,000 मासिक पेंशन पाने के लिए क्या करना होगा?')" class="px-3 py-1.5 bg-white hover:bg-orange-50 hover:border-orange-300 border border-slate-200 rounded-full font-medium text-slate-700 transition">
+          👵 Atal Pension Yojana (APY)
+        </button>
+        <button onclick="askPrompt('तहसील से आय एवं जाति प्रमाण पत्र बनवाने के लिए क्या दस्तावेज़ चाहिए?')" class="px-3 py-1.5 bg-white hover:bg-orange-50 hover:border-orange-300 border border-slate-200 rounded-full font-medium text-slate-700 transition">
+          📜 Income & Caste Certificate
+        </button>
+      </div>
+
+      <!-- Chat Messages Container -->
+      <div id="chatMessages" class="flex-1 p-5 overflow-y-auto space-y-4">
+        <!-- Assistant Welcome Message -->
+        <div class="flex items-start space-x-3 max-w-3xl">
+          <div class="w-9 h-9 rounded-xl bg-gov-saffron text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
+            JS
+          </div>
+          <div class="bg-slate-100 rounded-2xl rounded-tl-sm p-4 border border-slate-200 text-slate-800 text-sm leading-relaxed shadow-2xs">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="font-bold text-slate-900 text-xs">JanSeva AI Assistant</span>
+              <span class="text-[11px] text-slate-400">Just now</span>
+            </div>
+            <p>
+              नमस्ते! मैं आपका <strong>जनसेवा डिजिटल सहायक</strong> हूँ। मैं सरकारी योजनाओं (पीएम-किसान, आयुष्मान भारत, पेंशन), कर, राशन कार्ड तथा आय-जाति प्रमाण पत्र से जुड़े आपके सवालों का उत्तर आपकी मातृभाषा में देने और आवेदन प्रक्रिया में मदद के लिए तैयार हूँ।
+            </p>
+            <div class="mt-3 flex items-center space-x-2">
+              <button onclick="speakText(this.parentElement.previousElementSibling.innerText)" class="px-2.5 py-1 bg-white hover:bg-orange-50 border border-slate-300 rounded-md text-xs font-semibold text-slate-700 flex items-center space-x-1.5 transition">
+                <span>🔊</span>
+                <span>सुनें (Listen with Bulbul TTS)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <div class="p-3.5 bg-white border-t border-slate-200">
+        <form id="chatForm" onsubmit="handleChatSubmit(event)" class="flex items-center space-x-2">
+          <!-- Voice Record Button -->
+          <button type="button" id="voiceBtn" onclick="toggleVoiceInput()" title="Speak in your regional language" class="p-3 rounded-xl bg-slate-100 hover:bg-orange-100 text-slate-600 hover:text-gov-saffron border border-slate-200 transition flex-shrink-0">
+            <svg id="micIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3z"/></svg>
+          </button>
+
+          <!-- Input field -->
+          <input type="text" id="userInput" placeholder="Ask about any government scheme, pension, or application in your language..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-gov-saffron focus:bg-white transition">
+
+          <!-- Submit Button -->
+          <button type="submit" id="sendBtn" class="px-5 py-3 rounded-xl bg-gov-saffron hover:bg-orange-600 text-white font-semibold text-sm shadow-sm transition flex items-center space-x-2 flex-shrink-0">
+            <span>Send</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </form>
+        <div class="mt-2 text-[11px] text-slate-400 flex items-center justify-between px-1">
+          <span>Powered by Sarvam-105B Reasoning & Saaras Speech Recognition</span>
+          <span id="typingIndicator" class="hidden text-gov-saffron font-medium">Assistant is thinking...</span>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================== TAB 2: DOCUMENT VERIFICATION ==================== -->
+    <div id="tab-verify" class="tab-pane hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Document Selection & Upload -->
+        <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-xs border border-slate-200 space-y-5">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">1. Select Citizen Document</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Upload a photo/PDF or pick a government ID to inspect via Sarvam DocAI.</p>
+          </div>
+
+          <!-- Sample Pre-sets -->
+          <div class="space-y-2">
+            <label class="text-xs font-semibold text-slate-700">Choose Preset Sample Document:</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="selectDocPreset('aadhaar')" id="preset-aadhaar" class="preset-btn p-3 rounded-xl border-2 border-gov-saffron bg-orange-50 text-left transition">
+                <div class="text-lg">🪪</div>
+                <div class="font-bold text-xs text-slate-900 mt-1">Aadhaar</div>
+                <div class="text-[10px] text-slate-500">UIDAI Card</div>
+              </button>
+              <button onclick="selectDocPreset('pan')" id="preset-pan" class="preset-btn p-3 rounded-xl border border-slate-200 hover:border-slate-300 text-left transition">
+                <div class="text-lg">💳</div>
+                <div class="font-bold text-xs text-slate-900 mt-1">PAN Card</div>
+                <div class="text-[10px] text-slate-500">Income Tax</div>
+              </button>
+              <button onclick="selectDocPreset('income')" id="preset-income" class="preset-btn p-3 rounded-xl border border-slate-200 hover:border-slate-300 text-left transition">
+                <div class="text-lg">📜</div>
+                <div class="font-bold text-xs text-slate-900 mt-1">Income Cert</div>
+                <div class="text-[10px] text-slate-500">e-District</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Applicant Name Input -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Applicant Name (as in Scheme Application):</label>
+            <input type="text" id="verifyName" value="Ramesh Chandra Sharma" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-gov-saffron">
+          </div>
+
+          <!-- Upload Dropzone -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Upload Document File (Optional):</label>
+            <div class="border-2 border-dashed border-slate-300 hover:border-gov-saffron rounded-xl p-5 text-center cursor-pointer transition bg-slate-50">
+              <svg class="w-8 h-8 mx-auto text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+              <p class="text-xs text-slate-600 mt-1.5 font-medium">Click to upload or drag image/PDF</p>
+              <p class="text-[11px] text-slate-400">Supports JPG, PNG, PDF up to 10MB</p>
+            </div>
+          </div>
+
+          <!-- Analyze Action Button -->
+          <button onclick="runDocVerification()" id="verifyActionBtn" class="w-full py-3 px-4 rounded-xl bg-gov-navy hover:bg-blue-900 text-white font-semibold text-sm shadow-sm transition flex items-center justify-center space-x-2">
+            <span>Scan & Verify with Sarvam DocAI</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </button>
+        </div>
+
+        <!-- Right Column: Extracted Metadata & Verification Results -->
+        <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-xs border border-slate-200 flex flex-col justify-between space-y-6">
+          <div>
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+              <div>
+                <span class="text-xs font-bold text-gov-saffron uppercase tracking-wider">Verification Report</span>
+                <h2 id="reportDocTitle" class="text-lg font-bold text-slate-900">Aadhaar Card (UIDAI)</h2>
+              </div>
+              <div id="verifyBadge" class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center space-x-1">
+                <span>✓</span>
+                <span>Verified (98% Confidence)</span>
+              </div>
+            </div>
+
+            <!-- Extracted Key-Value Fields Grid -->
+            <div class="mt-5 space-y-3">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Extracted Document Fields (DocAI OCR):</h3>
+              <div id="fieldsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <!-- Dynamically populated fields -->
+              </div>
+            </div>
+
+            <!-- Verification Checklist -->
+            <div class="mt-6 space-y-3">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Automated Eligibility & Authenticity Checklist:</h3>
+              <div id="checklistContainer" class="space-y-2">
+                <!-- Dynamically populated checklist -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Footer -->
+          <div class="pt-4 border-t border-slate-200 flex items-center justify-between">
+            <span class="text-xs text-slate-500">Application ready for submission into National Portal</span>
+            <button onclick="submitApplicationSuccess()" class="px-5 py-2.5 rounded-xl bg-gov-green hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-xs flex items-center space-x-1.5">
+              <span>Generate Verified Scheme Application</span>
+              <span>→</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ==================== TAB 3: STATUS TRACKER & PROACTIVE ALERTS ==================== -->
+    <div id="tab-tracker" class="tab-pane hidden space-y-6">
+      
+      <!-- Top Search & Quick Select -->
+      <div class="bg-white p-5 rounded-2xl shadow-xs border border-slate-200 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-3 w-full sm:w-auto">
+          <label class="text-xs font-bold text-slate-700">Enter Reference ID:</label>
+          <div class="flex items-center space-x-2">
+            <input type="text" id="appSearchInput" value="JS-2026-9812" class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-800 focus:outline-none focus:ring-2 focus:ring-gov-saffron">
+            <button onclick="searchApplication()" class="px-4 py-2 bg-gov-navy text-white text-xs font-semibold rounded-lg hover:bg-blue-900 transition">
+              Track
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2 text-xs">
+          <span class="text-slate-400">Quick Samples:</span>
+          <button onclick="loadSampleApp('JS-2026-9812')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">
+            PM-Kisan (In Progress)
+          </button>
+          <button onclick="loadSampleApp('JS-2026-4409')" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium transition">
+            Ayushman Card (Approved)
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Tracking & Proactive Dispatch Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Application Timeline (Left 7 cols) -->
+        <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-xs border border-slate-200 space-y-6">
+          <div class="flex items-start justify-between pb-4 border-b border-slate-200">
+            <div>
+              <span id="trackerSchemeName" class="text-sm font-bold text-gov-saffron">PM-Kisan Samman Nidhi</span>
+              <h2 id="trackerApplicantName" class="text-lg font-bold text-slate-900 mt-0.5">Ramesh Chandra Sharma</h2>
+              <p class="text-xs text-slate-500">Ref: <span id="trackerRefId" class="font-mono font-semibold text-slate-700">JS-2026-9812</span> • Applied: 12-Oct-2026</p>
+            </div>
+            <div id="trackerStatusPill" class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold border border-blue-200">
+              In Progress
+            </div>
+          </div>
+
+          <!-- Stepper Timeline -->
+          <div class="space-y-4">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Verification & Disbursement Timeline</h3>
+            <div id="timelineSteps" class="space-y-4 relative before:absolute before:left-3.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200">
+              <!-- Dynamically populated steps -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Proactive Outreach Simulator (Right 5 cols) -->
+        <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-xs border border-slate-200 space-y-5">
+          <div>
+            <span class="text-xs font-bold text-gov-saffron uppercase tracking-wider">Sarvam Proactive Dispatch</span>
+            <h3 class="text-base font-bold text-slate-900 mt-0.5">Simulate Citizen Alert</h3>
+            <p class="text-xs text-slate-500">Test how the agent proactively notifies citizens through Voice or WhatsApp in regional languages.</p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="triggerVoiceCallSim()" class="p-3.5 rounded-xl border border-orange-200 bg-orange-50 hover:bg-orange-100 text-gov-saffron font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
+              <span class="text-xl">📞</span>
+              <span>Outbound Voice Call</span>
+              <span class="text-[10px] font-normal text-slate-500">Sarvam Bulbul TTS</span>
+            </button>
+            <button onclick="triggerWhatsAppSim()" class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-gov-green font-bold text-xs flex flex-col items-center justify-center space-y-1 transition">
+              <span class="text-xl">💬</span>
+              <span>WhatsApp Update</span>
+              <span class="text-[10px] font-normal text-slate-500">Regional Message</span>
+            </button>
+          </div>
+
+          <!-- Live Interactive Voice Call Mockup -->
+          <div id="voiceCallModal" class="p-4 rounded-xl bg-slate-900 text-white space-y-3 shadow-lg">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span class="text-xs font-bold tracking-wider text-slate-300 uppercase">Incoming Call: JanSeva Helpline</span>
+              </div>
+              <span class="text-[11px] text-slate-400 font-mono">1800-11-5555</span>
+            </div>
+            <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-700 text-xs leading-relaxed text-slate-200">
+              <p id="voiceTranscriptText" class="italic">
+                "नमस्ते रमेश जी, जनसेवा पोर्टल से अपडेट: आपकी पीएम-किसान 17वीं किस्त का दस्तावेज़ सत्यापन सफल रहा है..."
+              </p>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+              <button onclick="playVoiceAudio()" class="px-3 py-1.5 bg-gov-saffron hover:bg-orange-600 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition">
+                <span>🔊</span>
+                <span>Play Agent Speech</span>
+              </button>
+              <span class="text-[10px] text-slate-400">Language: हिन्दी (hi-IN)</span>
+            </div>
+          </div>
+
+          <!-- WhatsApp Mockup -->
+          <div id="whatsappCard" class="hidden rounded-xl border border-slate-200 bg-[#EFEAE2] p-4 space-y-2 shadow-xs">
+            <div class="flex items-center space-x-2 pb-2 border-b border-slate-300/60">
+              <div class="w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center text-[10px] font-bold">
+                ✓
+              </div>
+              <div>
+                <div class="text-xs font-bold text-slate-900 flex items-center space-x-1">
+                  <span>JanSeva Govt Verified</span>
+                  <span class="text-emerald-600 text-[10px]">✔</span>
+                </div>
+                <div class="text-[10px] text-slate-500">Official Government Channel</div>
+              </div>
+            </div>
+            <div class="bg-white p-3 rounded-lg shadow-2xs text-xs space-y-2 border border-slate-200/50">
+              <p id="waMessageText" class="text-slate-800 leading-relaxed">
+                नमस्ते रमेश जी, जनसेवा पोर्टल से अपडेट: आपकी पीएम-किसान 17वीं किस्त का दस्तावेज़ सत्यापन सफल रहा है।
+              </p>
+              <div class="pt-2 border-t border-slate-100 flex flex-col space-y-1">
+                <button class="w-full py-1 text-center text-xs font-semibold text-blue-600 hover:bg-blue-50 rounded transition">
+                  📄 View Acknowledgment Slip
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    JanSeva AI • Sovereign Citizen Services Agent • Integrated with Sarvam-105B, Saaras (STT), Bulbul (TTS) & DocAI
+  </footer>
+
+  <script>
+    // State management
+    let currentLang = 'hi-IN';
+    let currentDocPreset = 'aadhaar';
+    let chatHistory = [];
+    let isRecording = false;
+    let recognition = null;
+    let activeAudio = null;
+
+    // Switch Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('border-gov-saffron', 'text-gov-saffron');
+        el.classList.add('border-transparent', 'text-slate-600');
+      });
+
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+      const activeBtn = document.getElementById('tab-btn-' + tabId);
+      activeBtn.classList.remove('border-transparent', 'text-slate-600');
+      activeBtn.classList.add('border-gov-saffron', 'text-gov-saffron');
+
+      if (tabId === 'verify') {
+        runDocVerification();
+      } else if (tabId === 'tracker') {
+        searchApplication();
+      }
+    }
+
+    // Change Language
+    function changeLanguage() {
+      currentLang = document.getElementById('langSelect').value;
+      console.log('Active language set to:', currentLang);
+    }
+
+    // Fast Prompts
+    function askPrompt(text) {
+      document.getElementById('userInput').value = text;
+      document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+    }
+
+    // Chat Submission
+    async function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('userInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendChatMessage('user', text);
+      input.value = '';
+
+      const typing = document.getElementById('typingIndicator');
+      typing.classList.remove('hidden');
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            message: text,
+            language_code: currentLang,
+            history: chatHistory
+          })
+        });
+        const data = await res.json();
+        typing.classList.add('hidden');
+        appendChatMessage('assistant', data.reply, data.source);
+      } catch (err) {
+        typing.classList.add('hidden');
+        appendChatMessage('assistant', 'Error communicating with assistant. Please try again.');
+      }
+    }
+
+    function appendChatMessage(role, content, source) {
+      chatHistory.push({role, content});
+      const container = document.getElementById('chatMessages');
+
+      const wrapper = document.createElement('div');
+      wrapper.className = role === 'user' ? 'flex justify-end' : 'flex items-start space-x-3 max-w-3xl';
+
+      if (role === 'user') {
+        wrapper.innerHTML = `
+          <div class="bg-gov-navy text-white rounded-2xl rounded-tr-sm px-4 py-3 text-sm max-w-xl leading-relaxed shadow-sm">
+            <p>${escapeHtml(content)}</p>
+          </div>
+        `;
+      } else {
+        wrapper.innerHTML = `
+          <div class="w-9 h-9 rounded-xl bg-gov-saffron text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
+            JS
+          </div>
+          <div class="bg-slate-100 rounded-2xl rounded-tl-sm p-4 border border-slate-200 text-slate-800 text-sm leading-relaxed shadow-2xs">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="font-bold text-slate-900 text-xs">JanSeva AI Assistant</span>
+              <span class="text-[11px] text-slate-400">Now</span>
+            </div>
+            <div class="prose prose-sm">${escapeHtml(content)}</div>
+            ${source ? `<div class="mt-2 text-[10px] text-slate-400 border-t border-slate-200/60 pt-1.5">Engine: ${escapeHtml(source)}</div>` : ''}
+            <div class="mt-3 flex items-center space-x-2">
+              <button onclick="speakText(this.parentElement.previousElementSibling.previousElementSibling.innerText)" class="px-2.5 py-1 bg-white hover:bg-orange-50 border border-slate-300 rounded-md text-xs font-semibold text-slate-700 flex items-center space-x-1.5 transition">
+                <span>🔊</span>
+                <span>Listen with Bulbul TTS</span>
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      container.appendChild(wrapper);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    // Speech Output (Bulbul TTS or SpeechSynthesis)
+    async function speakText(text) {
+      if (activeAudio) {
+        activeAudio.pause();
+        activeAudio = null;
+      }
+
+      try {
+        const res = await fetch('/api/tts', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({text: text, language_code: currentLang})
+        });
+        const data = await res.json();
+        if (data.audio_base64) {
+          activeAudio = new Audio('data:audio/mp3;base64,' + data.audio_base64);
+          activeAudio.play();
+          return;
+        }
+      } catch (e) {
+        console.warn('API TTS failed, using fallback SpeechSynthesis:', e);
+      }
+
+      // Browser fallback speech
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = currentLang;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Voice Input Toggle (Web Speech API)
+    function toggleVoiceInput() {
+      const voiceBtn = document.getElementById('voiceBtn');
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        alert('Voice input is not supported by your browser. Please try Chrome or Edge.');
+        return;
+      }
+
+      if (isRecording) {
+        if (recognition) recognition.stop();
+        isRecording = false;
+        voiceBtn.classList.remove('bg-orange-500', 'text-white', 'pulse-ring');
+        voiceBtn.classList.add('bg-slate-100', 'text-slate-600');
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = currentLang;
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        isRecording = true;
+        voiceBtn.classList.remove('bg-slate-100', 'text-slate-600');
+        voiceBtn.classList.add('bg-orange-500', 'text-white', 'pulse-ring');
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('userInput').value = transcript;
+        document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+      };
+
+      recognition.onerror = () => {
+        isRecording = false;
+        voiceBtn.classList.remove('bg-orange-500', 'text-white', 'pulse-ring');
+        voiceBtn.classList.add('bg-slate-100', 'text-slate-600');
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        voiceBtn.classList.remove('bg-orange-500', 'text-white', 'pulse-ring');
+        voiceBtn.classList.add('bg-slate-100', 'text-slate-600');
+      };
+
+      recognition.start();
+    }
+
+    // Document Verification Logic
+    function selectDocPreset(preset) {
+      currentDocPreset = preset;
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.classList.remove('border-gov-saffron', 'bg-orange-50');
+        btn.classList.add('border-slate-200');
+      });
+      const active = document.getElementById('preset-' + preset);
+      if (active) {
+        active.classList.add('border-gov-saffron', 'bg-orange-50');
+        active.classList.remove('border-slate-200');
+      }
+      runDocVerification();
+    }
+
+    async function runDocVerification() {
+      const applicantName = document.getElementById('verifyName').value;
+      const formData = new FormData();
+      formData.append('doc_type', currentDocPreset);
+      formData.append('applicant_name', applicantName);
+
+      try {
+        const res = await fetch('/api/docai/verify', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        renderVerificationReport(data);
+      } catch (err) {
+        console.error('DocAI Verification error:', err);
+      }
+    }
+
+    function renderVerificationReport(data) {
+      document.getElementById('reportDocTitle').innerText = data.document_type;
+      const badge = document.getElementById('verifyBadge');
+      badge.innerHTML = `<span>✓</span><span>${data.status} (${Math.round(data.confidence * 100)}% Confidence)</span>`;
+
+      // Render fields grid
+      const grid = document.getElementById('fieldsGrid');
+      grid.innerHTML = '';
+      for (const [key, value] of Object.entries(data.extracted_fields)) {
+        const item = document.createElement('div');
+        item.className = 'p-2.5 rounded-lg bg-slate-50 border border-slate-200';
+        item.innerHTML = `
+          <div class="text-[10px] font-bold text-slate-400 uppercase">${escapeHtml(key)}</div>
+          <div class="font-semibold text-slate-800 mt-0.5 truncate">${escapeHtml(value)}</div>
+        `;
+        grid.appendChild(item);
+      }
+
+      // Render checklist
+      const cl = document.getElementById('checklistContainer');
+      cl.innerHTML = '';
+      data.checklist.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center space-x-2 text-xs';
+        row.innerHTML = `
+          <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-[10px]">✓</span>
+          <span class="text-slate-700 font-medium">${escapeHtml(c.item)}</span>
+        `;
+        cl.appendChild(row);
+      });
+    }
+
+    function submitApplicationSuccess() {
+      alert('Application generated successfully! Reference ID: JS-2026-9812 has been registered in the National Beneficiary Registry.');
+      switchTab('tracker');
+      loadSampleApp('JS-2026-9812');
+    }
+
+    // Application Tracker Logic
+    async function searchApplication() {
+      const ref = document.getElementById('appSearchInput').value.trim();
+      loadSampleApp(ref);
+    }
+
+    async function loadSampleApp(appId) {
+      document.getElementById('appSearchInput').value = appId;
+      try {
+        const res = await fetch('/api/applications/' + appId);
+        if (!res.ok) {
+          alert('Application ID not found. Try JS-2026-9812 or JS-2026-4409');
+          return;
+        }
+        const data = await res.json();
+        renderTrackerData(data);
+      } catch (err) {
+        console.error('Error fetching application:', err);
+      }
+    }
+
+    function renderTrackerData(data) {
+      document.getElementById('trackerSchemeName').innerText = data.scheme;
+      document.getElementById('trackerApplicantName').innerText = data.applicant;
+      document.getElementById('trackerRefId').innerText = data.id;
+
+      const pill = document.getElementById('trackerStatusPill');
+      pill.innerText = data.status;
+      if (data.status === 'Approved') {
+        pill.className = 'px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200';
+      } else {
+        pill.className = 'px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold border border-blue-200';
+      }
+
+      const stepsContainer = document.getElementById('timelineSteps');
+      stepsContainer.innerHTML = '';
+
+      data.steps.forEach((step, idx) => {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'relative flex items-start space-x-3.5 pl-1';
+
+        let iconBg = 'bg-slate-300 text-white';
+        let statusBadge = '<span class="text-[10px] text-slate-400">Pending</span>';
+
+        if (step.status === 'completed') {
+          iconBg = 'bg-emerald-500 text-white shadow-xs';
+          statusBadge = '<span class="text-[10px] text-emerald-600 font-bold">✓ Completed</span>';
+        } else if (step.status === 'in_progress') {
+          iconBg = 'bg-gov-saffron text-white ring-4 ring-orange-100 shadow-xs';
+          statusBadge = '<span class="text-[10px] text-gov-saffron font-bold">● In Progress</span>';
+        }
+
+        stepDiv.innerHTML = `
+          <div class="w-7 h-7 rounded-full ${iconBg} flex items-center justify-center font-bold text-xs z-10 flex-shrink-0">
+            ${idx + 1}
+          </div>
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex-1 flex items-center justify-between">
+            <div>
+              <div class="text-xs font-bold text-slate-800">${escapeHtml(step.name)}</div>
+              <div class="text-[11px] text-slate-400">${escapeHtml(step.date)}</div>
+            </div>
+            <div>${statusBadge}</div>
+          </div>
+        `;
+        stepsContainer.appendChild(stepDiv);
+      });
+
+      // Update Proactive Alert Preview
+      document.getElementById('voiceTranscriptText').innerText = `"${data.proactive_message_hi}"`;
+      document.getElementById('waMessageText').innerText = data.proactive_message_hi;
+    }
+
+    function triggerVoiceCallSim() {
+      document.getElementById('voiceCallModal').classList.remove('hidden');
+      document.getElementById('whatsappCard').classList.add('hidden');
+      playVoiceAudio();
+    }
+
+    function triggerWhatsAppSim() {
+      document.getElementById('whatsappCard').classList.remove('hidden');
+      document.getElementById('voiceCallModal').classList.add('hidden');
+    }
+
+    function playVoiceAudio() {
+      const text = document.getElementById('voiceTranscriptText').innerText.replace(/"/g, '');
+      speakText(text);
+    }
+
+    // Initial load
+    window.onload = () => {
+      runDocVerification();
+    };
+  </script>
+</body>
+</html>
